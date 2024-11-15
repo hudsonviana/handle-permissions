@@ -1,8 +1,8 @@
 import { hasPermission } from './libs/auth';
 import { users, comments } from './libs/mockComments';
-const user = { id: '3', role: 'admin', blockedBy: ['7', '14'] };
+const user = { id: '3', role: 'moderator', blockedBy: ['7', '14'] };
 
-const Comment = ({ item }) => {
+const Comment = ({ item, canDelete, canUpdate }) => {
   return (
     <div
       style={{
@@ -16,12 +16,8 @@ const Comment = ({ item }) => {
         <span>{item.id}</span>. Comentário do usuário ID: {item.author.id}
       </div>
       <div style={{ marginBottom: '10px' }}>{item.comment}</div>
-      {hasPermission(user, 'delete:comments', item.author) && (
-        <button>Deletar</button>
-      )}{' '}
-      {hasPermission(user, 'update:comments', item.author) && (
-        <button>Atualizar</button>
-      )}
+      {canDelete && <button>Deletar</button>}{' '}
+      {canUpdate && <button>Atualizar</button>}
     </div>
   );
 };
@@ -29,13 +25,22 @@ const Comment = ({ item }) => {
 const Page = () => {
   return (
     <>
-      {comments.map((item, index) =>
-        hasPermission(user, 'view:comments', item.author) ? (
-          <Comment item={item} key={index} />
+      {comments.map((item, index) => {
+        const canView = hasPermission(user, 'view:comments', item.author);
+        const canDelete = hasPermission(user, 'delete:comments', item.author);
+        const canUpdate = hasPermission(user, 'update:comments', item.author);
+
+        return canView ? (
+          <Comment
+            key={index}
+            item={item}
+            canDelete={canDelete}
+            canUpdate={canUpdate}
+          />
         ) : (
-          <div>cometário bloqueado</div>
-        )
-      )}
+          <div key={index}>comentário bloqueado</div>
+        );
+      })}
     </>
   );
 };
