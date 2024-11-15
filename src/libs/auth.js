@@ -9,13 +9,13 @@ const ROLES = {
     'delete:comments',
   ],
   moderator: [
-    'view:comments',
+    'view:own.comments',
     'create:comments',
     'update:own.comments',
     'delete:comments',
   ],
   user: [
-    'view:comments',
+    'view:nonBlockedUser.comments',
     'create:comments',
     'update:own.comments',
     'delete:own.comments',
@@ -29,10 +29,20 @@ export const hasPermission = (user, permission, author = null) => {
 
   if (author) {
     const [action, resource] = permission.split(':');
-    return (
+
+    if (
       ROLES[user.role].includes(`${action}:own.${resource}`) &&
       author.id === user.id
-    );
+    ) {
+      return true;
+    }
+
+    if (
+      ROLES[user.role].includes(`${action}:nonBlockedUser.${resource}`) &&
+      !author.blockedBy.includes(user.id)
+    ) {
+      return true;
+    }
   }
 
   return false;
