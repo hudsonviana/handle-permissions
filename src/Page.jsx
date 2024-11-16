@@ -16,8 +16,8 @@ const Comment = ({ item, canDelete, canUpdate }) => {
         <span>{item.id}</span>. Comentário do usuário ID: {item.author.id}
       </div>
       <div style={{ marginBottom: '10px' }}>{item.comment}</div>
-      {canDelete && <button>Deletar</button>}{' '}
-      {canUpdate && <button>Atualizar</button>}
+      {canDelete ? <button>Deletar</button> : null}{' '}
+      {canUpdate ? <button>Atualizar</button> : null}
     </div>
   );
 };
@@ -37,9 +37,8 @@ const Page = () => {
             canDelete={canDelete}
             canUpdate={canUpdate}
           />
-        ) : (
-          <div key={index}>comentário bloqueado</div>
-        );
+        ) : null;
+        // <div key={index}>comentário bloqueado</div>
       })}
     </>
   );
